@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/q13117god/ng-golang-http-80-q13117god:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/q13117god/ng-golang-http-80-q13117god:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: ng-golang-http-80-q13117god
+        chartPath: charts/ng-golang-http-80-q13117god
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/q13117god/ng-golang-http-80-q13117god'
+          image.tag: '{{.DIGEST_HEX}}'
